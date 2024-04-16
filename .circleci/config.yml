@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/node:latest
-    steps: 
+    steps:
       - checkout
 
       - run:
@@ -24,7 +24,11 @@ jobs:
           command: cat domains.txt
 
       - run:
+          name: Install notify
+          command: |
+            go get -u github.com/projectdiscovery/notify/cmd/notify
+
+      - run:
           name: Send domains to Discord
           command: |
-            content=$(cat domains.txt)
-            curl -X POST -H "Content-Type: application/json" -d '{"content":"```'"$content"'```"}' https://discordapp.com/api/webhooks/1229117362461216869/s9R4dRmpW9tJD2C0mZUBYq-1Bs0bFTsBW8SZqbvKPsUV5H2jHDe70fSFh4cNiveedAW5
+            notify -discord-webhook-url="https://discordapp.com/api/webhooks/1229117362461216869/s9R4dRmpW9tJD2C0mZUBYq-1Bs0bFTsBW8SZqbvKPsUV5H2jHDe70fSFh4cNiveedAW5" -message-file="domains.txt" -provider=discord
