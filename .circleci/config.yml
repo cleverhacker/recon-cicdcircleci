@@ -10,12 +10,11 @@ jobs:
           name: Install assetfinder
           command: |
             go install github.com/tomnomnom/assetfinder@latest
-            chmod +x ~/go/bin/assetfinder
 
       - run:
           name: Find domains with assetfinder
           command: |
-            ~/go/bin/assetfinder test.com > domains.txt
+            assetfinder test.com > domains.txt
 
       - run:
           name: Display domains file
