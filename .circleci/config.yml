@@ -23,7 +23,7 @@ jobs:
       - run:
           name: Install notify
           command: |
-            go install -v github.com/projectdiscovery/notify/cmd/notify@latest
+            go install github.com/projectdiscovery/notify/cmd/notify@latest
       - run:
           name: Send domains to Discord
           command: |
