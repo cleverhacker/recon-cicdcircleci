@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/node:latest
-    steps:
+    steps: 
       - checkout
 
       - run:
