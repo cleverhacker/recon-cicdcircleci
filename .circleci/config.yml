@@ -1,30 +1,74 @@
 version: 2.1
-jobs:
-  build:
-    docker:
-      - image: circleci/golang@latest
-    steps:
-      - checkout
 
+jobs:
+  subdomain_scan:
+    docker:
+      - image: golang:latest
+    steps:
       - run:
           name: Install assetfinder
           command: |
             go install github.com/tomnomnom/assetfinder@latest
-
       - run:
-          name: Find domains with assetfinder
+          name: Run assetfinder and save output
           command: |
-            assetfinder test.com > domains.txt
+            assetfinder hackdserone.com > subdomains.txt
+      - persist_to_workspace:
+          root: .
+          paths:
+            - subdomains.txt
 
+  nuclei_scan:
+    docker:
+      - image: golang:latest
+    steps:
+      - attach_workspace:
+          at: .
       - run:
-          name: Display domains file
-          command: cat domains.txt
+          name: Install nuclei
+          command: |
+            go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+      - run:
+          name: Run nuclei and save output
+          command: |
+            nuclei -l subdomains.txt -severity low,medium,high,critical -o nuclei_result.txt
+      - persist_to_workspace:
+          root: .
+          paths:
+            - nuclei_result.txt
 
+  notify:
+    docker:
+      - image: golang:latest
+    steps:
+      - attach_workspace:
+          at: .
       - run:
           name: Install notify
           command: |
             go install github.com/projectdiscovery/notify/cmd/notify@latest
       - run:
-          name: Send domains to Discord
+          name: Move config.yaml
           command: |
-            notify -discord-webhook-url="https://discordapp.com/api/webhooks/1229117362461216869/s9R4dRmpW9tJD2C0mZUBYq-1Bs0bFTsBW8SZqbvKPsUV5H2jHDe70fSFh4cNiveedAW5" -message-file="domains.txt" -provider=discord
+            mkdir -p /root/.config/notify/
+            mv provider-config.yaml /root/.config/notify/
+      - run:
+          name: Send subdomain results to Discord
+          command: |
+            notify -id subs -i subdomains.txt
+      - run:
+          name: Send nuclei results to Discord
+          command: |
+            notify -id nuclei -i nuclei_result.txt
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - subdomain_scan
+      - nuclei_scan:
+          requires:
+            - subdomain_scan
+      - notify:
+          requires:
+            - nuclei_scan
