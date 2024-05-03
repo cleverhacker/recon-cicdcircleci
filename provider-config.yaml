@@ -1,0 +1,12 @@
+discord:
+  - id: "nuclei"
+    discord_channel: "nuclei"
+    discord_username: "nuclei"
+    discord_format: "{{data}}"
+    discord_webhook_url: "https://discordapp.com/api/webhooks/846005603515891724/KGkqLPWcgNrNt3TIczRQKbmv4ZLwbQIU6xfI_3y_0lEN_XqK55piVS33yO_tbzKrtpVQ"
+
+  - id: "subs"
+    discord_channel: "subdomains"
+    discord_username: "Subdomain Finder"
+    discord_format: "{{data}}"
+    discord_webhook_url: "https://discordapp.com/api/webhooks/1235618452463681689/OgGFERifp0w25KoAJL25H4DzqAMpY_kW90MDdlqchKgMNWzqFjOVX10Ma8euV5XnuyaZ"
